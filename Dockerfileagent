@@ -1,0 +1,11 @@
+FROM jenkins/inbound-agent:latest
+
+USER root
+
+# Устанавливаем sudo, если он не установлен
+RUN apt-get update && apt-get install -y sudo python3 && \
+    usermod -aG sudo jenkins && \
+    echo 'jenkins ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/make' >> /etc/sudoers
+
+# Переключаемся на обычного пользователя
+USER jenkins
