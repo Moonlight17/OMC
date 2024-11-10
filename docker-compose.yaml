@@ -2,7 +2,9 @@ version: "3"
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: ./ 
+      dockerfile: Dockerfilemaster
     container_name: jenkins
     networks:
       - public-network
