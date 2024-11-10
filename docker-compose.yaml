@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    networks:
+      - public-network
+      - jenkins-network
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8080"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+
+
+  jenkins-agent:
+    build:
+      context: ./ 
+      dockerfile: Dockerfileagent  
+    container_name: jenkins-agent
+    volumes:
+      - agent_workdir:/home/jenkins/agent
+    depends_on:
+      - jenkins
+    networks:
+      - jenkins-network
+    environment:
+      - JENKINS_URL=http://jenkins:8080
+      - JENKINS_AGENT_SSH_PORT=22
+      - JENKINS_SECRET=secret
+      - JENKINS_AGENT_NAME=agent1
+      - JENKINS_SECRET=a053c804ab3ddebf34e91a982c7e236d26ac0908badf0b96ec579d4f5f50d3ad
+
+
+networks:
+  public-network:
+    external: true
+  jenkins-network:
+    driver: bridge
+    internal: true
+
+volumes:
+  jenkins_home:
+  agent_workdir:
+
+
+# /var/jenkins_home/secrets/initialAdminPassword
