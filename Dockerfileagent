@@ -1,11 +1,15 @@
+# Use the official Jenkins inbound-agent image as the base
 FROM jenkins/inbound-agent:latest
 
+# Switch to root user to perform administrative tasks
 USER root
 
-# Устанавливаем sudo, если он не установлен
-RUN apt-get update && apt-get install -y sudo python3 && \
+# Update package lists and install  &&  Add 'jenkins' user to the sudo group and allow passwordless 'make' execution
+RUN apt-get update && \
+    apt-get install -y sudo autoconf python3 make autoconf pkg-config libssl-dev libnghttp2-dev zlib1g-dev libpsl-dev build-essential libtool && \
     usermod -aG sudo jenkins && \
-    echo 'jenkins ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/make' >> /etc/sudoers
+    echo 'jenkins ALL=(ALL) NOPASSWD: /usr/bin/make' >> /etc/sudoers && \
+    apt clean 
 
-# Переключаемся на обычного пользователя
+# Switch back to 'jenkins' user
 USER jenkins

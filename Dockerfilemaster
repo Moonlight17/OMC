@@ -1,0 +1,19 @@
+# Use the official Jenkins LTS image as base
+FROM jenkins/jenkins:lts
+
+# Switch to root user for installation
+USER root
+
+# Install sudo, allow jenkins user to run apt without password, and clean up
+RUN apt update && \
+    apt install -y sudo && \
+    usermod -aG sudo jenkins && \
+    echo 'jenkins ALL=(ALL) NOPASSWD: /usr/bin/apt' >> /etc/sudoers && \
+    apt clean 
+
+# Expose Jenkins HTTP and agent ports
+EXPOSE 8080 
+EXPOSE 50000
+
+# Switch back to 'jenkins' user
+USER jenkins
