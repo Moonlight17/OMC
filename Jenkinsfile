@@ -34,7 +34,7 @@ pipeline {
                 // Prepare configuration files for building
                 sh 'autoreconf -fi'
                 sh './configure --disable-shared --enable-static --without-ssl'
-                sh 'make'
+                sh 'make clean && make'
             }
         }
         stage('Run Tests and install') {
@@ -46,21 +46,29 @@ pipeline {
         }
         stage('Result stage') {
             steps{
-                // Output the version of the installed curl
+                // Output the version of the installed curl and test isolate binary file
                 sh './src/curl --version'
+                sh 'mkdir -p ./isolate_folder_for_curl_binary_file'
+                sh 'cp ./src/curl ./isolate_folder_for_curl_binary_file/curl'
+                sh './isolate_folder_for_curl_binary_file/curl --version'
             }
         }
     }
     post {
         success {
             // Archive the built executable as an artifact upon successful build
-            archiveArtifacts artifacts: 'src/.libs/, src/curl', allowEmptyArchive: true  // Adjust the path to your executable
+            archiveArtifacts artifacts: 'src/curl', allowEmptyArchive: true  // Adjust the path to your executable
             echo 'Build succeeded and artifact archived!'
         }
         failure {
             // If the build fails, output a failure message
-            echo 'Build failed!'
+            script {
+                mess = "🚨🚨🚨 #${env.JOB_NAME} Build with \n\n *ERROR* \n\n ${env.BUILD_NUMBER}, @Moonlight1790"
+            }
+            withCredentials([string(credentialsId: 'dest', variable: 'SECRET')]){
+                echo 'Build failed!'
+                telegramSend(message: "${mess}", chatId: "${dest}")
+            }
         }
     }
 }
-
