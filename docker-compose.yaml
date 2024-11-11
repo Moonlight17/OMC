@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfileagent  
     container_name: jenkins-agent
     volumes:
-      - agent_workdir:/home/jenkins/agent
+      - ./agent_workdir:/home/jenkins/agent
     depends_on:
       - jenkins
     networks:
