@@ -58,7 +58,13 @@ pipeline {
         success {
             // Archive the built executable as an artifact upon successful build
             archiveArtifacts artifacts: 'src/curl', allowEmptyArchive: true  // Adjust the path to your executable
-            echo 'Build succeeded and artifact archived!'
+            script {
+                mess = "✅✅✅ #${env.JOB_NAME}  \n\n *Successfully* builded \n\n It was build number (${env.BUILD_NUMBER})"
+            }
+            withCredentials([string(credentialsId: 'dest', variable: 'SECRET')]){
+                echo 'Build succeeded and artifact archived!'
+                telegramSend(message: "${mess}", chatId: "${dest}")
+            }
         }
         failure {
             // If the build fails, output a failure message
