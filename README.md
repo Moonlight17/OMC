@@ -1,3 +1,4 @@
+# OMC DevOps Task by Serov Sergei
 # Jenkins Pipeline Documentation
 
 ## Pipeline Steps
